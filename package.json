@@ -1,0 +1,35 @@
+{
+  "name": "dtable-js",
+  "version": "1.0.0",
+  "description": "A JavaScript DataTable library with type validation, filtering, sorting and SQL database integration. Inspired by .NET's DataTable.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mazeor7/dtable-js"
+  },
+  "keywords": [
+    "datatable",
+    "dataTable",
+    "datatable-js",
+    "datatablejs",
+    "datarow",
+    "datarow-js",
+    "dataRow",
+    "DataTable",
+    "datacolumn",
+    "dataColumn",
+    "DataColumn",
+    "datacolumncollection",
+    "dataColumnCollection",
+    "DataColumnCollection",
+    "indexColumn",
+    "index",
+    "dtable-js",
+    "dTable-js"
+  ],
+  "author": "mazeor",
+  "license": "MIT"
+}
