@@ -2,6 +2,17 @@
 
 A lightweight and flexible package for managing tabular data with features similar to .NET's DataTable. This package provides an efficient way to handle structured data with support for typed columns, data validation, sorting, and filtering. It can be used with any SQL database like PostgreSQL, MySQL, SQLite, or SQL Server.
 
+  <div align="center">
+  <p>
+    <a href="https://github.com/mazeor7/dtable-js/releases/latest">
+  <img src="https://img.shields.io/github/v/release/mazeor7/dtable-js?style=for-the-badge" alt="GitHub release (latest SemVer)" /></a>
+    <a href="https://github.com/mazeor7/dtable-js/releases/latest">
+    <img src="https://img.shields.io/github/release-date/mazeor7/dtable-js?label=latest%20release&style=for-the-badge" alt="Latest release" /></a>
+   <a href="https://www.npmjs.com/package/dtable-js"><img src="https://img.shields.io/npm/v/dtable-js.svg?logo=npm&style=for-the-badge" alt="npm version" /></a>
+    <a href="https://www.npmjs.com/package/dtable-js"><img src="https://img.shields.io/npm/dt/dtable-js.svg?style=for-the-badge" alt="NPM downloads" /></a>
+  </p>
+</div>
+
 ## Installation
 
 ```bash
