@@ -199,7 +199,7 @@ class DataTable {
      */
     findRows(criteria) {
         if (typeof criteria === 'function') {
-            return this.rows._rows.filter(row => criteria(row._values));
+            return this.rows._rows.filter(row => criteria(row));
         }
     
         return this.rows._rows.filter(row => {

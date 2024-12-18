@@ -13,15 +13,13 @@ class DataRow {
     }
 
     /**
+     * Alias for get()
      * @param {string} columnName - Name of the column to retrieve value from
      * @returns {*} The value stored in the specified column
      * @throws {Error} If the column doesn't exist
      */
     item(columnName) {
-        if (!this._table.columns.contains(columnName)) {
-            throw new Error(`Column '${columnName}' does not exist`);
-        }
-        return this._values[columnName];
+        return this.get(columnName);
     }
 
     /**
@@ -32,9 +30,16 @@ class DataRow {
     get(index) {
         if (typeof index === 'number') {
             const columnNames = Array.from(this._table.columns._columns.keys());
-            return this._values[columnNames[index]];
+            const columnName = columnNames[index];
+            if (!this._table.columns.contains(columnName)) {
+                throw new Error(`Column at index ${index} does not exist`);
+            }
+            return this._values[columnName];
         }
-        return this.item(index);
+        if (!this._table.columns.contains(index)) {
+            throw new Error(`Column '${index}' does not exist`);
+        }
+        return this._values[index];
     }
 
     /**

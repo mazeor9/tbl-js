@@ -2,6 +2,17 @@
 
 A lightweight and flexible package for managing tabular data with features similar to .NET's DataTable. This package provides an efficient way to handle structured data with support for typed columns, data validation, sorting, and filtering. It can be used with any SQL database like PostgreSQL, MySQL, SQLite, or SQL Server.
 
+  <div align="center">
+  <p>
+    <a href="https://github.com/mazeor7/dtable-js/releases/latest">
+  <img src="https://img.shields.io/github/v/release/mazeor7/dtable-js?style=for-the-badge" alt="GitHub release (latest SemVer)" /></a>
+    <a href="https://github.com/mazeor7/dtable-js/releases/latest">
+    <img src="https://img.shields.io/github/release-date/mazeor7/dtable-js?label=latest%20release&style=for-the-badge" alt="Latest release" /></a>
+   <a href="https://www.npmjs.com/package/dtable-js"><img src="https://img.shields.io/npm/v/dtable-js.svg?logo=npm&style=for-the-badge" alt="npm version" /></a>
+    <a href="https://www.npmjs.com/package/dtable-js"><img src="https://img.shields.io/npm/dt/dtable-js.svg?style=for-the-badge" alt="NPM downloads" /></a>
+  </p>
+</div>
+
 ## Installation
 
 ```bash
@@ -100,13 +111,13 @@ dt.rows.add(row);
 
 ### Row Operations
 ```javascript
-// Get value using row index and column name
-const value = dt.rows(0).item("value");  // Gets value from first row, column "value"
-const name = dt.rows(1).item("name");    // Gets value from second row, column "name"
+// Get value using row index and column name (recommended method)
+const value = dt.rows(0).get("value");  // Gets value from first row, column "value"
+const name = dt.rows(1).get("name");    // Gets value from second row, column "name"
 
 // Alternative ways to get values
-const name = row.get('name');
-const age = row.item('age');
+const name = row.get('name');    // Recommended
+const age = row.item('age');     // Supported for backwards compatibility
 
 // Set value
 row.set('name', 'NewName');
@@ -121,13 +132,19 @@ dt.clear();
 ### Data Operations
 
 #### Filtering Data
-```javascript
-// Using select
-const adults = dt.select(row => row.age >= 18);
+The DataTable provides two methods for filtering data:
+- `select()`: Works directly with row values as plain objects. Access values using dot notation (e.g., `row.age`)
+- `findRows()`: Works with DataRow objects. Access values using the get() method (e.g., `row.get('age')`)
 
-// Using findRows
+Examples:
+```javascript
+// Using select - direct property access
+const adults = dt.select(row => row.age >= 18);
+const activeUsers = dt.select(row => row.age > 25 && row.active === true);
+
+// Using findRows - using get() method
 const johns = dt.findRows({ name: 'John' });
-const over25 = dt.findRows(row => row.age > 25);
+const over25 = dt.findRows(row => row.get('age') > 25);
 ```
 
 ### Advanced Filtering Criteria
@@ -243,8 +260,8 @@ dt.removeColumn('age');
 const newTable = dt.clone();
 
 // Iterate through rows
-for (const row of dt) {
-    console.log(row.get('name'));
+for (const row of newTable) {
+    console.log(row.get('name')); // using recommended get() method
 }
 ```
 

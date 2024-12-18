@@ -5,14 +5,24 @@ class DataRowCollection {
         this._table = table;
         this._rows = [];
          // direct access to index column
-         return new Proxy(this, {
-            get(target, prop) {
+         const func = (index) => this._rows[index];
+        
+        // Copia tutte le proprietà e metodi nell'oggetto funzione
+        Object.setPrototypeOf(func, DataRowCollection.prototype);
+        Object.assign(func, this);
+        
+        // Crea un proxy per gestire sia l'accesso via indice che via funzione
+        return new Proxy(func, {
+            get: (target, prop) => {
                 if (typeof prop === 'string' && !isNaN(Number(prop))) {
                     return target._rows[prop];
                 }
                 return target[prop];
+            },
+            apply: (target, thisArg, [index]) => {
+                return target._rows[index];
             }
-        }); 
+        });
     }
 
     /**
