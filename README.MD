@@ -11,7 +11,11 @@ npm install dtable-js
 ## Basic Usage
 
 ```javascript
+// Destructuring
 const { DataTable } = require('dtable-js');
+
+// Direct import
+const DataTable = require('dtable-js').DataTable;
 
 // Create a new table
 const dt = new DataTable('Users');
