@@ -1,6 +1,6 @@
 {
   "name": "dtable-js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A JavaScript DataTable library with type validation, filtering, sorting and SQL database integration. Inspired by .NET's DataTable.",
   "main": "src/index.js",
   "scripts": {
