@@ -73,6 +73,8 @@ db.all('SELECT * FROM products', [], (err, rows) => {
 - Data validation
 - Query result loading
 - Database integration
+- DataSet support for related tables 
+- DataView for filtered views of tables
 
 ## API Reference
 
@@ -263,6 +265,101 @@ const newTable = dt.clone();
 for (const row of newTable) {
     console.log(row.get('name')); // using recommended get() method
 }
+```
+
+### DataSet Operations
+DataSet allows you to manage multiple related tables and define relationships between them.
+
+```javascript
+const { DataSet, DataTable } = require('dtable-js');
+
+// Create a new dataset
+const ds = new DataSet('CompanyData');
+
+// Add tables to the dataset
+const employees = ds.addTable('Employees');
+employees.addColumn('id', 'number');
+employees.addColumn('name', 'string');
+employees.addColumn('departmentId', 'number');
+
+const departments = ds.addTable('Departments');
+departments.addColumn('id', 'number');
+departments.addColumn('name', 'string');
+
+// Add data
+departments.addRow({ id: 1, name: 'HR' });
+departments.addRow({ id: 2, name: 'IT' });
+
+employees.addRow({ id: 1, name: 'John', departmentId: 2 });
+employees.addRow({ id: 2, name: 'Jane', departmentId: 1 });
+
+// Create a relation between tables
+const relation = ds.addRelation(
+    'EmpDeptRelation',
+    'Departments', 
+    'Employees',
+    'id',
+    'departmentId'
+);
+
+// Get related rows
+const itDept = departments.findOne({ id: 2 });
+const itEmployees = ds.getChildRows(itDept, 'EmpDeptRelation');
+console.log(itEmployees); // [{ id: 1, name: 'John', departmentId: 2 }]
+
+// Get parent row
+const john = employees.findOne({ name: 'John' });
+const johnsDept = ds.getParentRow(john, 'EmpDeptRelation');
+console.log(johnsDept.get('name')); // 'IT'
+```
+
+### DataView Operations
+DataView provides a filtered and sorted view of a DataTable.
+```javascript
+const { DataTable, DataView } = require('dtable-js');
+
+// Create a table
+const users = new DataTable('Users');
+users.addColumn('id', 'number');
+users.addColumn('name', 'string');
+users.addColumn('age', 'number');
+users.addColumn('active', 'boolean');
+
+// Add some data
+users.addRow({ id: 1, name: 'John', age: 25, active: true });
+users.addRow({ id: 2, name: 'Jane', age: 30, active: true });
+users.addRow({ id: 3, name: 'Bob', age: 22, active: false });
+users.addRow({ id: 4, name: 'Alice', age: 35, active: true });
+
+// Create a view of active users sorted by age
+const activeUsersView = new DataView(
+    users,
+    { active: true },  // Filter
+    'age',            // Sort by
+    'desc'            // Sort order
+);
+
+// Use the view
+console.log(`Active users: ${activeUsersView.count}`); // 3
+
+// Get the first row (oldest active user due to desc sort)
+const oldest = activeUsersView.firstRow;
+console.log(oldest.get('name')); // 'Alice'
+
+// Iterate through view rows
+for (const row of activeUsersView) {
+    console.log(`${row.get('name')}: ${row.get('age')}`);
+}
+// Output:
+// Alice: 35
+// Jane: 30
+// John: 25
+
+// Create a new table from the view
+const activeUsersTable = activeUsersView.toTable();
+
+// Get view data as array of objects
+const activeUsersArray = activeUsersView.toArray();
 ```
 
 ## Supported Data Types
