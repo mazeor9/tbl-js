@@ -75,6 +75,7 @@ db.all('SELECT * FROM products', [], (err, rows) => {
 - Database integration
 - DataSet support for related tables 
 - DataView for filtered views of tables
+- Advanced schema management and serialization
 
 ## API Reference
 
@@ -361,6 +362,126 @@ const activeUsersTable = activeUsersView.toTable();
 // Get view data as array of objects
 const activeUsersArray = activeUsersView.toArray();
 ```
+
+### Advanced Schema Management
+
+The DataTable provides advanced schema management capabilities for working with table structures:
+
+```javascript
+const { DataTable } = require('dtable-js');
+
+// Create a table with schema
+const users = new DataTable('Users');
+users.addColumn('id', 'number');
+users.addColumn('name', 'string');
+users.addColumn('age', 'number');
+
+// Mark column as primary key
+users.columns._columns.get('id').isPrimaryKey = true;
+users.columns._columns.get('id').allowNull = false;
+
+// Export the schema to a portable format
+const schema = users.exportSchema();
+console.log(schema);
+/* Output:
+{
+  tableName: 'Users',
+  caseSensitive: false,
+  columns: [
+    {
+      name: 'id',
+      dataType: 'number',
+      allowNull: false,
+      defaultValue: null,
+      expression: null,
+      readOnly: false,
+      unique: true,
+      ordinal: 0,
+      caption: 'id',
+      isPrimaryKey: true
+    },
+    // ...other columns
+  ],
+  primaryKey: ['id'],
+  uniqueConstraints: []
+}
+*/
+
+// Save schema to JSON
+const schemaJson = users.serializeSchema();
+// Later, recreate the table from JSON
+const recreatedTable = DataTable.deserializeSchema(schemaJson);
+
+// Create another table with a different schema
+const updatedUsers = new DataTable('UpdatedUsers');
+updatedUsers.addColumn('id', 'number');
+updatedUsers.addColumn('name', 'string');
+updatedUsers.addColumn('age', 'number');
+updatedUsers.addColumn('email', 'string'); // New column
+updatedUsers.columns._columns.get('name').allowNull = false; // Changed nullability
+
+// Compare schemas
+const differences = users.compareSchema(updatedUsers);
+console.log(differences);
+/* Output:
+{
+  missingColumns: ['email'],
+  extraColumns: [],
+  typeMismatches: [],
+  nullabilityDifferences: [
+    {
+      column: 'name',
+      thisAllowNull: true,
+      otherAllowNull: false
+    }
+  ]
+}
+*/
+
+// Update schema
+const updateResult = users.updateSchema(updatedUsers);
+console.log(updateResult);
+/* Output:
+{
+  addedColumns: ['email'],
+  removedColumns: [],
+  modifiedColumns: [
+    {
+      column: 'name',
+      change: 'allowNull',
+      from: true,
+      to: false
+    }
+  ]
+}
+*/
+
+// Create a table from an existing schema
+const newTable = DataTable.importSchema({
+  tableName: 'Products',
+  columns: [
+    { name: 'id', dataType: 'number', allowNull: false, defaultValue: null },
+    { name: 'name', dataType: 'string', allowNull: false },
+    { name: 'price', dataType: 'number', defaultValue: 0 },
+    { name: 'createdAt', dataType: 'date', defaultValue: () => new Date() }
+  ],
+  primaryKey: ['id']
+});
+```
+The schema management features allow you to:
+
+- Export table structure to a portable format
+- Create tables from existing schemas
+- Compare schemas between tables to identify differences
+- Update a table's schema to match another
+- Serialize/deserialize schemas to JSON
+
+This is especially useful for:
+
+- -Creating table structures dynamically based on configuration
+- Migrating data between different schema versions
+- Generating table documentation
+- Schema validation and enforcement
 
 ## Supported Data Types
 * string
