@@ -9,6 +9,7 @@ class DataColumn {
         this.expression = null;
         this.readOnly = false;
         this.unique = false;
+        this.isPrimaryKey = false;
         this._table = null;
     }
 

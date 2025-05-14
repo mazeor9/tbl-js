@@ -77,17 +77,17 @@ class DataTable {
             this.rows._rows.sort((a, b) => {
                 const valueA = a.item(columnNameOrComparer);
                 const valueB = b.item(columnNameOrComparer);
-    
+
                 // Gestione null/undefined
                 if (valueA === valueB) return 0;
                 if (valueA == null) return 1;
                 if (valueB == null) return -1;
-    
+
                 // Gestione dei tipi
                 const column = this.columns._columns.get(columnNameOrComparer);
                 let comparison = 0;
-    
-                switch(column.dataType?.toLowerCase()) {
+
+                switch (column.dataType?.toLowerCase()) {
                     case 'number':
                         comparison = Number(valueA) - Number(valueB);
                         break;
@@ -101,7 +101,7 @@ class DataTable {
                         // Fallback
                         comparison = String(valueA).localeCompare(String(valueB));
                 }
-    
+
                 return order === 'asc' ? comparison : -comparison;
             });
         }
@@ -158,7 +158,7 @@ class DataTable {
      */
     clone() {
         const newTable = new DataTable(this.tableName);
-        
+
         // Clone columns
         for (const col of this.columns) {
             const newColumn = new DataColumn(
@@ -173,7 +173,7 @@ class DataTable {
             newColumn.unique = col.unique;
             newTable.columns.add(newColumn);
         }
-    
+
         // Clone rows state
         for (const row of this.rows) {
             const newRow = newTable.newRow();
@@ -182,10 +182,10 @@ class DataTable {
             newRow._rowState = row._rowState;
             newTable.rows.add(newRow);
         }
-    
+
         // Clone other properties
         newTable.caseSensitive = this.caseSensitive;
-    
+
         return newTable;
     }
 
@@ -201,15 +201,15 @@ class DataTable {
         if (typeof criteria === 'function') {
             return this.rows._rows.filter(row => criteria(row));
         }
-    
+
         return this.rows._rows.filter(row => {
             return Object.entries(criteria).every(([key, value]) => {
                 const rowValue = row._values[key];
-                
+
                 if (value instanceof RegExp) {
                     return value.test(String(rowValue));
                 }
-                
+
                 if (typeof value === 'object' && value !== null) {
                     // support operators
                     if ('$gt' in value) return rowValue > value.$gt;
@@ -220,12 +220,12 @@ class DataTable {
                     if ('$in' in value) return value.$in.includes(rowValue);
                     if ('$contains' in value) return String(rowValue).includes(value.$contains);
                 }
-                
+
                 return rowValue === value;
             });
         });
     }
-    
+
     /**
      * @param {Object|Function} criteria - Search criteria or filter function
      * @returns {DataRow|null} First row that matches the criteria or null
@@ -254,7 +254,7 @@ class DataTable {
             let dataType = typeof value;
             if (value instanceof Date) dataType = 'date';
             if (value === null) dataType = 'string'; // default type for null values
-            
+
             this.addColumn(columnName, dataType);
         }
 
@@ -271,6 +271,221 @@ class DataTable {
     async loadFromQueryAsync(queryPromise) {
         const results = await queryPromise;
         this.loadFromQuery(results);
+    }
+
+    /**
+ * Exports the schema definition of the table
+ * @returns {Object} Schema definition object
+ */
+    exportSchema() {
+        const schema = {
+            tableName: this.tableName,
+            caseSensitive: this.caseSensitive,
+            columns: [],
+            primaryKey: null,
+            uniqueConstraints: []
+        };
+
+        // Export columns
+        for (const column of this.columns) {
+            schema.columns.push({
+                name: column.columnName,
+                dataType: column.dataType,
+                allowNull: column.allowNull,
+                defaultValue: column.defaultValue,
+                expression: column.expression,
+                readOnly: column.readOnly,
+                unique: column.unique,
+                ordinal: column.ordinal,
+                caption: column.caption
+            });
+
+            // Add primary key info
+            if (column.isPrimaryKey) {
+                if (!schema.primaryKey) {
+                    schema.primaryKey = [];
+                }
+                schema.primaryKey.push(column.columnName);
+            }
+
+            // Add unique constraints
+            if (column.unique && !column.isPrimaryKey) {
+                schema.uniqueConstraints.push({
+                    columns: [column.columnName],
+                    name: `UQ_${this.tableName}_${column.columnName}`
+                });
+            }
+        }
+
+        return schema;
+    }
+
+    /**
+     * Creates a new DataTable from a schema definition
+     * @param {Object} schema - Schema definition object
+     * @returns {DataTable} A new DataTable instance configured with the schema
+     */
+    static importSchema(schema) {
+        const table = new DataTable(schema.tableName);
+        table.caseSensitive = schema.caseSensitive || false;
+
+        // Import columns
+        for (const columnDef of schema.columns) {
+            const column = table.addColumn(columnDef.name, columnDef.dataType);
+            column.allowNull = columnDef.allowNull !== undefined ? columnDef.allowNull : true;
+            column.defaultValue = columnDef.defaultValue;
+            column.expression = columnDef.expression;
+            column.readOnly = columnDef.readOnly || false;
+            column.unique = columnDef.unique || false;
+            column.caption = columnDef.caption || columnDef.name;
+
+            // Set primary key
+            if (schema.primaryKey && schema.primaryKey.includes(columnDef.name)) {
+                column.isPrimaryKey = true;
+                column.allowNull = false; // Primary key cannot be null
+                column.unique = true;     // Primary key must be unique
+            }
+        }
+
+        return table;
+    }
+
+    /**
+     * Compares the schema of this table with another
+     * @param {DataTable} otherTable - Table to compare schema with
+     * @returns {Object} Object containing differences between schemas
+     */
+    compareSchema(otherTable) {
+        const differences = {
+            missingColumns: [],
+            extraColumns: [],
+            typeMismatches: [],
+            nullabilityDifferences: []
+        };
+
+        // Check for missing or type-mismatched columns
+        for (const column of this.columns) {
+            if (!otherTable.columnExists(column.columnName)) {
+                differences.missingColumns.push(column.columnName);
+            } else {
+                const otherColumn = otherTable.columns._columns.get(column.columnName);
+
+                // Check for type mismatches
+                if (column.dataType !== otherColumn.dataType) {
+                    differences.typeMismatches.push({
+                        column: column.columnName,
+                        thisType: column.dataType,
+                        otherType: otherColumn.dataType
+                    });
+                }
+
+                // Check for nullability differences
+                if (column.allowNull !== otherColumn.allowNull) {
+                    differences.nullabilityDifferences.push({
+                        column: column.columnName,
+                        thisAllowNull: column.allowNull,
+                        otherAllowNull: otherColumn.allowNull
+                    });
+                }
+            }
+        }
+
+        // Check for extra columns in other table
+        for (const column of otherTable.columns) {
+            if (!this.columnExists(column.columnName)) {
+                differences.extraColumns.push(column.columnName);
+            }
+        }
+
+        return differences;
+    }
+
+    /**
+     * Updates the schema of the table to match another table
+     * @param {DataTable} sourceTable - Source table to copy schema from
+     * @param {boolean} [addMissingColumns=true] - Whether to add missing columns
+     * @param {boolean} [removeExtraColumns=false] - Whether to remove extra columns
+     * @returns {Object} Result of the schema update operation
+     */
+    updateSchema(sourceTable, addMissingColumns = true, removeExtraColumns = false) {
+        const result = {
+            addedColumns: [],
+            removedColumns: [],
+            modifiedColumns: []
+        };
+
+        const differences = this.compareSchema(sourceTable);
+
+        // Add missing columns
+        if (addMissingColumns) {
+            for (const columnName of differences.missingColumns) {
+                const sourceColumn = sourceTable.columns._columns.get(columnName);
+                const newColumn = this.addColumn(
+                    columnName,
+                    sourceColumn.dataType
+                );
+
+                newColumn.allowNull = sourceColumn.allowNull;
+                newColumn.defaultValue = sourceColumn.defaultValue;
+                newColumn.expression = sourceColumn.expression;
+                newColumn.readOnly = sourceColumn.readOnly;
+                newColumn.unique = sourceColumn.unique;
+                newColumn.caption = sourceColumn.caption;
+
+                result.addedColumns.push(columnName);
+            }
+        }
+
+        // Remove extra columns
+        if (removeExtraColumns) {
+            for (const columnName of differences.extraColumns) {
+                this.removeColumn(columnName);
+                result.removedColumns.push(columnName);
+            }
+        }
+
+        // Update column definitions
+        for (const mismatch of differences.typeMismatches) {
+            const column = this.columns._columns.get(mismatch.column);
+            column.dataType = sourceTable.columns._columns.get(mismatch.column).dataType;
+            result.modifiedColumns.push({
+                column: mismatch.column,
+                change: 'dataType',
+                from: mismatch.thisType,
+                to: mismatch.otherType
+            });
+        }
+
+        for (const diff of differences.nullabilityDifferences) {
+            const column = this.columns._columns.get(diff.column);
+            column.allowNull = sourceTable.columns._columns.get(diff.column).allowNull;
+            result.modifiedColumns.push({
+                column: diff.column,
+                change: 'allowNull',
+                from: diff.thisAllowNull,
+                to: diff.otherAllowNull
+            });
+        }
+
+        return result;
+    }
+
+    /**
+     * Serializes the table schema to JSON
+     * @returns {string} JSON string of the schema
+     */
+    serializeSchema() {
+        return JSON.stringify(this.exportSchema());
+    }
+
+    /**
+     * Creates a DataTable from a serialized schema
+     * @param {string} schemaJson - JSON string of the schema
+     * @returns {DataTable} A new DataTable instance
+     */
+    static deserializeSchema(schemaJson) {
+        const schema = JSON.parse(schemaJson);
+        return DataTable.importSchema(schema);
     }
 
 }
