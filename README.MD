@@ -1,32 +1,32 @@
-# dtable-js
+# tbl-js
 
 A lightweight and flexible package for managing tabular data with features similar to .NET's DataTable. This package provides an efficient way to handle structured data with support for typed columns, data validation, sorting, and filtering. It can be used with any SQL database like PostgreSQL, MySQL, SQLite, or SQL Server.
 
   <div align="center">
   <p>
-    <a href="https://github.com/mazeor9/dtable-js/releases/latest">
-  <img src="https://img.shields.io/github/v/release/mazeor9/dtable-js?style=for-the-badge" alt="GitHub release (latest SemVer)" /></a>
-    <a href="https://github.com/mazeor9/dtable-js/releases/latest">
-    <img src="https://img.shields.io/github/release-date/mazeor9/dtable-js?label=latest%20release&style=for-the-badge" alt="Latest release" /></a>
-   <a href="https://www.npmjs.com/package/dtable-js"><img src="https://img.shields.io/npm/v/dtable-js.svg?logo=npm&style=for-the-badge" alt="npm version" /></a>
-    <a href="https://www.npmjs.com/package/dtable-js"><img src="https://img.shields.io/npm/dt/dtable-js.svg?style=for-the-badge" alt="NPM downloads" /></a>
+    <a href="https://github.com/mazeor9/tbl-js/releases/latest">
+  <img src="https://img.shields.io/github/v/release/mazeor9/tbl-js?style=for-the-badge" alt="GitHub release (latest SemVer)" /></a>
+    <a href="https://github.com/mazeor9/tbl-js/releases/latest">
+    <img src="https://img.shields.io/github/release-date/mazeor9/tbl-js?label=latest%20release&style=for-the-badge" alt="Latest release" /></a>
+   <a href="https://www.npmjs.com/package/tbl-js"><img src="https://img.shields.io/npm/v/tbl-js.svg?logo=npm&style=for-the-badge" alt="npm version" /></a>
+    <a href="https://www.npmjs.com/package/tbl-js"><img src="https://img.shields.io/npm/dt/tbl-js.svg?style=for-the-badge" alt="NPM downloads" /></a>
   </p>
 </div>
 
 ## Installation
 
 ```bash
-npm install dtable-js
+npm install tbl-js
 ```
 
 ## Basic Usage
 
 ```javascript
 // Destructuring
-const { DataTable } = require('dtable-js');
+const { DataTable } = require('tbl-js');
 
 // Direct import
-const DataTable = require('dtable-js').DataTable;
+const DataTable = require('tbl-js').DataTable;
 
 // Create a new table
 const dt = new DataTable('Users');
@@ -272,18 +272,18 @@ for (const row of newTable) {
 DataSet allows you to manage multiple related tables and define relationships between them.
 
 ```javascript
-const { DataSet, DataTable } = require('dtable-js');
+const { DataSet, DataTable } = require('tbl-js');
 
 // Create a new dataset
 const ds = new DataSet('CompanyData');
 
 // Add tables to the dataset
-const employees = ds.addTable('Employees');
+const employees = ds.adtbl-js('Employees');
 employees.addColumn('id', 'number');
 employees.addColumn('name', 'string');
 employees.addColumn('departmentId', 'number');
 
-const departments = ds.addTable('Departments');
+const departments = ds.adtbl-js('Departments');
 departments.addColumn('id', 'number');
 departments.addColumn('name', 'string');
 
@@ -317,7 +317,7 @@ console.log(johnsDept.get('name')); // 'IT'
 ### DataView Operations
 DataView provides a filtered and sorted view of a DataTable.
 ```javascript
-const { DataTable, DataView } = require('dtable-js');
+const { DataTable, DataView } = require('tbl-js');
 
 // Create a table
 const users = new DataTable('Users');
@@ -368,7 +368,7 @@ const activeUsersArray = activeUsersView.toArray();
 The DataTable provides advanced schema management capabilities for working with table structures:
 
 ```javascript
-const { DataTable } = require('dtable-js');
+const { DataTable } = require('tbl-js');
 
 // Create a table with schema
 const users = new DataTable('Users');
