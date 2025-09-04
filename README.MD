@@ -77,7 +77,7 @@ db.all('SELECT * FROM products', [], (err, rows) => {
 - DataView for filtered views of tables
 - Advanced schema management and serialization
 
-## API Reference
+## Methods
 
 ### Table Operations
 
