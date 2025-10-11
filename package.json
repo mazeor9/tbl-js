@@ -30,7 +30,11 @@
     "dtable-js",
     "dTable-js",
     "dt-js",
-    "dtable"
+    "dtable",
+    "dotnet",
+    ".net",
+    "dot.net",
+    "dotnet datatable"
   ],
   "author": "mazeor",
   "license": "MIT"
