@@ -87,12 +87,17 @@ class DataRow {
             }
         }
     
+        // Save original value if not already saved
         if (!this._originalValues.hasOwnProperty(columnName)) {
             this._originalValues[columnName] = this._values[columnName];
         }
     
         this._values[columnName] = value;
-        this._rowState = DataRowState.MODIFIED;
+        
+        // Update state only if not already ADDED
+        if (this._rowState !== DataRowState.ADDED) {
+            this._rowState = DataRowState.MODIFIED;
+        }
     }
 
     toJSON() {
@@ -101,6 +106,54 @@ class DataRow {
 
     toString() {
         return JSON.stringify(this._values);
+    }
+
+    // ===== ROWSTATE MANAGEMENT METHODS =====
+
+    /**
+     * Accepts all changes made to the row
+     */
+    acceptChanges() {
+        this._originalValues = { ...this._values };
+        this._rowState = DataRowState.UNCHANGED;
+    }
+
+    /**
+     * Rejects all changes and restores original values
+     */
+    rejectChanges() {
+        if (this._rowState === DataRowState.ADDED) {
+            throw new Error('Cannot reject changes for newly added rows');
+        }
+        
+        this._values = { ...this._originalValues };
+        this._rowState = DataRowState.UNCHANGED;
+    }
+
+    /**
+     * Checks if the row has unsaved changes
+     * @returns {boolean}
+     */
+    hasChanges() {
+        return DataRowState.isChanged(this._rowState);
+    }
+
+    /**
+     * Gets the current row state
+     * @returns {string}
+     */
+    getRowState() {
+        return this._rowState;
+    }
+
+    /**
+     * Marks the row as deleted
+     */
+    delete() {
+        if (this._rowState === DataRowState.DELETED) {
+            return;
+        }
+        this._rowState = DataRowState.DELETED;
     }
 }
 

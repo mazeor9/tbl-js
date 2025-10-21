@@ -132,6 +132,132 @@ dt.removeRow(0);
 dt.clear();
 ```
 
+### Row State Management
+DataTable-js provides comprehensive row state tracking to monitor changes to your data. Each row has a state that indicates whether it has been added, modified, deleted, or remains unchanged.
+
+#### Row States
+- `ADDED`: New row that hasn't been saved
+- `MODIFIED`: Existing row that has been changed
+- `DELETED`: Row marked for deletion
+- `UNCHANGED`: Row with no pending changes
+
+#### Individual Row State Operations
+```javascript
+// Check row state
+const row = dt.rows(0);
+console.log(row.getRowState()); // 'ADDED', 'MODIFIED', 'DELETED', or 'UNCHANGED'
+
+// Check if row has changes
+if (row.hasChanges()) {
+    console.log('Row has unsaved changes');
+}
+
+// Accept changes (mark as UNCHANGED)
+row.acceptChanges();
+
+// Reject changes (revert to original values)
+row.rejectChanges();
+
+// Mark row for deletion
+row.delete();
+console.log(row.getRowState()); // 'DELETED'
+
+// Example workflow
+const row = dt.newRow();
+row.set('name', 'John');
+console.log(row.getRowState()); // 'ADDED'
+
+dt.rows.add(row);
+row.acceptChanges();
+console.log(row.getRowState()); // 'UNCHANGED'
+
+row.set('name', 'Jane');
+console.log(row.getRowState()); // 'MODIFIED'
+console.log(row.hasChanges()); // true
+
+row.rejectChanges();
+console.log(row.get('name')); // 'John' (reverted)
+console.log(row.getRowState()); // 'UNCHANGED'
+```
+
+#### Table-Level State Operations
+```javascript
+// Accept all changes in the table
+dt.acceptAllChanges();
+
+// Reject all changes in the table
+dt.rejectAllChanges();
+
+// Get all rows with changes
+const changedRows = dt.getChanges();
+console.log(`${changedRows.length} rows have changes`);
+
+// Get rows by specific state
+const addedRows = dt.getRowsByState('ADDED');
+const modifiedRows = dt.getRowsByState('MODIFIED');
+const deletedRows = dt.getRowsByState('DELETED');
+
+// Check if table has any changes
+if (dt.hasChanges()) {
+    console.log('Table has unsaved changes');
+    
+    // Show summary of changes
+    console.log(`Added: ${dt.getRowsByState('ADDED').length}`);
+    console.log(`Modified: ${dt.getRowsByState('MODIFIED').length}`);
+    console.log(`Deleted: ${dt.getRowsByState('DELETED').length}`);
+}
+
+// Practical example: Save changes workflow
+async function saveChanges(dataTable) {
+    if (!dataTable.hasChanges()) {
+        console.log('No changes to save');
+        return;
+    }
+    
+    try {
+        const changes = dataTable.getChanges();
+        
+        for (const row of changes) {
+            const state = row.getRowState();
+            
+            if (state === 'ADDED') {
+                // Insert new row to database
+                await insertRow(row);
+            } else if (state === 'MODIFIED') {
+                // Update existing row in database
+                await updateRow(row);
+            } else if (state === 'DELETED') {
+                // Delete row from database
+                await deleteRow(row);
+            }
+        }
+        
+        // Accept all changes after successful save
+        dataTable.acceptAllChanges();
+        console.log('All changes saved successfully');
+        
+    } catch (error) {
+        console.error('Error saving changes:', error);
+        // Optionally reject changes on error
+        // dataTable.rejectAllChanges();
+    }
+}
+```
+
+#### DataRowState Utility Methods
+```javascript
+const { DataRowState } = require('tbl-js');
+
+// Check if a state represents a changed row
+console.log(DataRowState.isChanged('MODIFIED')); // true
+console.log(DataRowState.isChanged('ADDED')); // true
+console.log(DataRowState.isChanged('UNCHANGED')); // false
+
+// Check if a state represents an unchanged row
+console.log(DataRowState.isUnchanged('UNCHANGED')); // true
+console.log(DataRowState.isUnchanged('MODIFIED')); // false
+```
+
 ### Data Operations
 
 #### Filtering Data

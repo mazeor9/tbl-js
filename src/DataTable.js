@@ -488,6 +488,55 @@ class DataTable {
         return DataTable.importSchema(schema);
     }
 
+    // ===== ROWSTATE MANAGEMENT METHODS =====
+
+    /**
+     * Accepts changes for all rows in the table
+     */
+    acceptAllChanges() {
+        for (const row of this.rows) {
+            if (row.hasChanges()) {
+                row.acceptChanges();
+            }
+        }
+    }
+
+    /**
+     * Rejects changes for all modified rows in the table
+     */
+    rejectAllChanges() {
+        for (const row of this.rows) {
+            if (row.hasChanges() && row.getRowState() !== 'ADDED') {
+                row.rejectChanges();
+            }
+        }
+    }
+
+    /**
+     * Gets all rows that have changes
+     * @returns {Array<DataRow>} Array of rows with changes
+     */
+    getChanges() {
+        return this.rows._rows.filter(row => row.hasChanges());
+    }
+
+    /**
+     * Gets rows by their state
+     * @param {string} state - Row state to filter by
+     * @returns {Array<DataRow>} Array of rows in the specified state
+     */
+    getRowsByState(state) {
+        return this.rows._rows.filter(row => row.getRowState() === state);
+    }
+
+    /**
+     * Checks if the table has any unsaved changes
+     * @returns {boolean}
+     */
+    hasChanges() {
+        return this.rows._rows.some(row => row.hasChanges());
+    }
+
 }
 
 module.exports = DataTable;
