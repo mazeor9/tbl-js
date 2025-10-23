@@ -537,6 +537,66 @@ class DataTable {
         return this.rows._rows.some(row => row.hasChanges());
     }
 
+    /**
+     * Gets a detailed summary of all changes in the table
+     * @returns {Object} Summary object with counts and details
+     */
+    getChangesSummary() {
+        const summary = {
+            totalRows: this.rows._rows.length,
+            addedCount: 0,
+            modifiedCount: 0,
+            deletedCount: 0,
+            unchangedCount: 0,
+            hasChanges: false,
+            addedRows: [],
+            modifiedRows: [],
+            deletedRows: []
+        };
+
+        for (const row of this.rows._rows) {
+            const state = row.getRowState();
+            
+            switch (state) {
+                case 'ADDED':
+                    summary.addedCount++;
+                    summary.addedRows.push(row);
+                    break;
+                case 'MODIFIED':
+                    summary.modifiedCount++;
+                    summary.modifiedRows.push(row);
+                    break;
+                case 'DELETED':
+                    summary.deletedCount++;
+                    summary.deletedRows.push(row);
+                    break;
+                case 'UNCHANGED':
+                    summary.unchangedCount++;
+                    break;
+            }
+        }
+
+        summary.hasChanges = summary.addedCount > 0 || summary.modifiedCount > 0 || summary.deletedCount > 0;
+        
+        return summary;
+    }
+
+    /**
+     * Clears all row states without losing data (sets all rows to UNCHANGED)
+     * This is useful when you want to reset tracking without accepting/rejecting changes
+     */
+    clearChanges() {
+        for (const row of this.rows._rows) {
+            if (row.getRowState() !== 'DELETED') {
+                row._setRowState('UNCHANGED');
+                // Clear original values tracking
+                if (row._originalValues) {
+                    row._originalValues = {};
+                }
+            }
+        }
+    }
+
 }
 
 module.exports = DataTable;

@@ -258,6 +258,58 @@ console.log(DataRowState.isUnchanged('UNCHANGED')); // true
 console.log(DataRowState.isUnchanged('MODIFIED')); // false
 ```
 
+#### Advanced State Management Methods
+```javascript
+// Get detailed summary of all changes
+const summary = dt.getChangesSummary();
+console.log(summary);
+/* Output:
+{
+    totalRows: 10,
+    addedCount: 2,
+    modifiedCount: 3,
+    deletedCount: 1,
+    unchangedCount: 4,
+    hasChanges: true,
+    addedRows: [DataRow, DataRow],
+    modifiedRows: [DataRow, DataRow, DataRow],
+    deletedRows: [DataRow]
+}
+*/
+
+// Use summary for detailed reporting
+if (summary.hasChanges) {
+    console.log(`Changes detected:`);
+    console.log(`- ${summary.addedCount} new rows`);
+    console.log(`- ${summary.modifiedCount} modified rows`);
+    console.log(`- ${summary.deletedCount} deleted rows`);
+    console.log(`- ${summary.unchangedCount} unchanged rows`);
+}
+
+// Clear all change tracking without losing data
+// This sets all rows to UNCHANGED state
+dt.clearChanges();
+console.log(dt.hasChanges()); // false
+
+// Practical example: Reset tracking after manual sync
+async function syncWithDatabase(dataTable) {
+    const summary = dataTable.getChangesSummary();
+    
+    if (!summary.hasChanges) {
+        console.log('No changes to sync');
+        return;
+    }
+    
+    console.log(`Syncing ${summary.addedCount + summary.modifiedCount + summary.deletedCount} changes...`);
+    
+    // Perform database operations...
+    // After successful sync, clear the change tracking
+    dataTable.clearChanges();
+    
+    console.log('Sync completed, change tracking reset');
+}
+```
+
 ### Data Operations
 
 #### Filtering Data
@@ -404,12 +456,12 @@ const { DataSet, DataTable } = require('tbl-js');
 const ds = new DataSet('CompanyData');
 
 // Add tables to the dataset
-const employees = ds.adtbl-js('Employees');
+const employees = ds.addTable('Employees');
 employees.addColumn('id', 'number');
 employees.addColumn('name', 'string');
 employees.addColumn('departmentId', 'number');
 
-const departments = ds.adtbl-js('Departments');
+const departments = ds.addTable('Departments');
 departments.addColumn('id', 'number');
 departments.addColumn('name', 'string');
 
