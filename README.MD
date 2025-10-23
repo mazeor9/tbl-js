@@ -2,16 +2,59 @@
 
 A lightweight and flexible package for managing tabular data with features similar to .NET's DataTable. This package provides an efficient way to handle structured data with support for typed columns, data validation, sorting, and filtering. It can be used with any SQL database like PostgreSQL, MySQL, SQLite, or SQL Server.
 
-  <div align="center">
+<div align="center">
   <p>
+    <a href="https://www.npmjs.com/package/tbl-js">
+      <img src="https://img.shields.io/npm/v/tbl-js.svg?logo=npm&style=for-the-badge&color=CB3837" alt="NPM Version" />
+    </a>
+    <a href="https://www.npmjs.com/package/tbl-js">
+      <img src="https://img.shields.io/npm/dt/tbl-js.svg?style=for-the-badge&color=CB3837" alt="NPM Downloads" />
+    </a>
     <a href="https://github.com/mazeor9/tbl-js/releases/latest">
-  <img src="https://img.shields.io/github/v/release/mazeor9/tbl-js?style=for-the-badge" alt="GitHub release (latest SemVer)" /></a>
-    <a href="https://github.com/mazeor9/tbl-js/releases/latest">
-    <img src="https://img.shields.io/github/release-date/mazeor9/tbl-js?label=latest%20release&style=for-the-badge" alt="Latest release" /></a>
-   <a href="https://www.npmjs.com/package/tbl-js"><img src="https://img.shields.io/npm/v/tbl-js.svg?logo=npm&style=for-the-badge" alt="npm version" /></a>
-    <a href="https://www.npmjs.com/package/tbl-js"><img src="https://img.shields.io/npm/dt/tbl-js.svg?style=for-the-badge" alt="NPM downloads" /></a>
+      <img src="https://img.shields.io/github/v/release/mazeor9/tbl-js?style=for-the-badge&color=green" alt="GitHub Release" />
+    </a>
+    <a href="https://github.com/mazeor9/tbl-js/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/mazeor9/tbl-js?style=for-the-badge&color=blue" alt="License" />
+    </a>
+    <a href="https://github.com/mazeor9/tbl-js">
+      <img src="https://img.shields.io/github/stars/mazeor9/tbl-js?style=for-the-badge&color=yellow" alt="GitHub Stars" />
+    </a>
+    <a href="https://bundlephobia.com/package/tbl-js">
+      <img src="https://img.shields.io/bundlephobia/minzip/tbl-js?style=for-the-badge&color=orange" alt="Bundle Size" />
+    </a>
   </p>
 </div>
+
+## Features
+
+- Strongly typed columns
+- Row management
+- Sorting and filtering
+- Data validation
+- Query result loading
+- Database integration
+
+## 📋 Table of Contents
+
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Database Integration](#database-integration)
+- [Features](#features)
+- [Methods](#methods)
+  - [Table Operations](#table-operations)
+  - [Row Operations](#row-operations)
+  - [Row State Management](#row-state-management)
+  - [Data Operations](#data-operations)
+  - [Advanced Filtering](#advanced-filtering-criteria)
+  - [Column Operations](#column-operations)
+  - [Table Manipulation](#table-manipulation)
+  - [DataSet Operations](#dataset-operations)
+  - [DataView Operations](#dataview-operations)
+  - [Schema Management](#advanced-schema-management)
+- [Supported Data Types](#supported-data-types)
+- [Advanced Database Usage](#advanced-database-usage)
+- [Error Handling](#error-handling)
+- [License](#license)
 
 ## Installation
 
